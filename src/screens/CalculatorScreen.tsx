@@ -1,96 +1,23 @@
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {View, Text} from 'react-native';
 import {styles} from '../themes/appTheme';
 import CalcButton from '../components/CalcButton';
-
-enum Operations {
-  add,
-  substract,
-  multiplication,
-  division,
-}
+import useCalculator from '../hooks/useCalculator';
 
 const CalculatorScreen = () => {
-  const [previousNumber, setPreviousNumber] = useState('0');
-  const [number, setNumber] = useState('0');
-
-  const lasOperation = useRef<Operations>();
-
-  const clean = () => {
-    setNumber('0');
-    setPreviousNumber('0');
-  };
-
-  const btnDelete = () => {
-    let negative = '';
-    let tempNumber = number;
-    if (number.includes('-')) {
-      negative = '-';
-      tempNumber = number.substr(1);
-    }
-    if (tempNumber.length > 1) {
-      setNumber(negative + tempNumber.slice(0, -1));
-    } else {
-      setNumber('0');
-    }
-  };
-
-  const saveNumber = (textNumber: string) => {
-    // dont accept two points
-    if (number.includes('.') && textNumber === '.') return;
-    if (number.startsWith('0' || number.startsWith('-0'))) {
-      if (textNumber === '.') {
-        setNumber(number + textNumber);
-      } else if (textNumber === '0' && number.includes('.')) {
-        setNumber(number + textNumber);
-      } else if (textNumber !== '0' && !number.includes('.')) {
-        setNumber(textNumber);
-      } else if (textNumber === '0' && !number.includes('.')) {
-        setNumber(number);
-      } else {
-        setNumber(number + textNumber);
-      }
-    } else {
-      setNumber(number + textNumber);
-    }
-  };
-
-  const togglePositiveAndNegative = () => {
-    if (number.includes('-')) {
-      setNumber(number.replace('-', ''));
-    } else {
-      setNumber('-' + number);
-    }
-  };
-
-  const addPreviousNumber = () => {
-    if (number.endsWith('.')) {
-      setPreviousNumber(number.slice(0, -1));
-    } else {
-      setPreviousNumber(number);
-    }
-    setNumber('0');
-  };
-
-  const divisionBtn = () => {
-    addPreviousNumber();
-    lasOperation.current = Operations.division;
-  };
-
-  const multiplicationBtn = () => {
-    addPreviousNumber();
-    lasOperation.current = Operations.multiplication;
-  };
-
-  const substractBtn = () => {
-    addPreviousNumber();
-    lasOperation.current = Operations.substract;
-  };
-
-  const addBtn = () => {
-    addPreviousNumber();
-    lasOperation.current = Operations.add;
-  };
+  const {
+    number,
+    previousNumber,
+    clean,
+    btnDelete,
+    saveNumber,
+    togglePositiveAndNegative,
+    divisionBtn,
+    multiplicationBtn,
+    substractBtn,
+    addBtn,
+    doCalculation,
+  } = useCalculator();
 
   return (
     <View style={styles.calculatorContainer}>
@@ -133,7 +60,7 @@ const CalculatorScreen = () => {
       <View style={styles.row}>
         <CalcButton text="0" width action={saveNumber} />
         <CalcButton text="." action={saveNumber} />
-        <CalcButton text="=" color="#ff9427" action={clean} />
+        <CalcButton text="=" color="#ff9427" action={doCalculation} />
       </View>
     </View>
   );
